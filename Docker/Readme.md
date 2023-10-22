@@ -1,1 +1,1 @@
-## Command, Usefull links and Content.
+## Command, Useful links, and other Content.
