@@ -1,0 +1,151 @@
+'''
+Author: Karan Joshi
+Last Updated: 16/05/2024
+Description: Delete all Lease and build od CI pipeline of Azure DevOps
+Workflow: 
+  1. Get All Project Name. 
+  2. First Delete Lease associated with builds.
+  3. Delete Lease
+'''
+
+import requests
+from requests.auth import HTTPBasicAuth
+
+# Azure DevOps organization URL and project name
+organization = 'ORGRANIZATION_ID'
+project = 'YOUR_PROJECT_NAME'
+
+# Personal Access Token (PAT)
+pat = 'YOUR_PAT_HERE'
+
+# Base URL for the Azure DevOps REST API
+base_url = f'https://dev.azure.com/{organization}/{project}/_apis/pipelines'
+
+def fun_pipeline_info():
+    # Headers for API request
+    headers = {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
+    }
+
+    # Make GET request to retrieve pipelines
+    response = requests.get(base_url, headers=headers, auth=HTTPBasicAuth('', pat))
+
+    # Check if request was successful
+    if response.status_code == 200:
+        pipelines = response.json()['value']
+        print("Pipelines:")
+        for pipeline in pipelines:
+            pipeline_name = pipeline['name']
+            pipeline_id = pipeline['id']
+            print(f"\tName: {pipeline_name}, ID: {pipeline_id}")
+    else:
+        print(f"Failed to retrieve pipelines. Status code: {response.status_code}")
+
+def get_build_info(pipeline_id):
+    # Base URL for the Azure DevOps REST API
+    base_url = f'https://dev.azure.com/{organization}/{project}/_apis/build/builds?definitions={pipeline_id}&api-version=7.1'
+
+    build_numbers = []
+    # Headers for API request
+    headers = {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
+    }
+
+    # Make GET request to retrieve builds for the specified pipeline
+    response = requests.get(base_url, headers=headers, auth=HTTPBasicAuth('', pat))
+
+    # Check if request was successful
+    if response.status_code == 200:
+        builds = response.json()['value']
+        print("\n---- Builds for Pipeline----\n")
+        for build in builds:
+            build_id = build['id']
+            build_numbers.append(build_id)
+            build_number = build['buildNumber']
+            print(f"\tBuild ID: {build_id}, Build Number: {build_number}")
+    else:
+        print(f"Failed to retrieve builds. Status code: {response.status_code}")
+    return build_numbers
+        
+def get_build_leases(build_ids):
+    leases = {}
+    for build_id in build_ids:
+        base_url = f'https://dev.azure.com/{organization}/{project}/_apis/build/builds/{build_id}/leases?api-version=7.1-preview.1'
+        headers = {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache'
+        }
+        response = requests.get(base_url, headers=headers, auth=HTTPBasicAuth('', pat))
+
+        if response.status_code == 200:
+            build_leases = response.json()['value']
+            leases[build_id] = build_leases
+        else:
+            print(f"Failed to retrieve leases for build {build_id}. Status code: {response.status_code}")
+
+    # print(leases)     
+    all_lease_id = []
+    for build_id, build_leases in leases.items():
+        print(f"Build ID: {build_id}")
+        for lease in build_leases:
+            print(f"\tLease ID: {lease['leaseId']}")
+            all_lease_id.append(lease['leaseId'])
+    
+    return all_lease_id
+
+def delete_build_leases(lease_ids):
+    deleted_ids = []
+    for lease_id in lease_ids:
+        base_url = f'https://dev.azure.com/{organization}/{project}/_apis/build/retention/leases?ids={lease_id}&api-version=7.1-preview.2'
+        headers = {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache'
+        }
+        response = requests.delete(base_url, headers=headers, auth=HTTPBasicAuth('', pat))
+
+        if response.status_code == 204:
+            deleted_ids.append(lease_id)
+        else:
+            print(f"Failed to delete lease {lease_id}. Status code: {response.status_code}")
+    return deleted_ids
+
+def delete_builds(build_ids):
+    deleted_ids = []
+    for build_id in build_ids:
+        base_url = f'https://dev.azure.com/{organization}/{project}/_apis/build/builds/{build_id}?api-version=7.1-preview.7'
+        headers = {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache'
+        }
+        response = requests.delete(base_url, headers=headers, auth=HTTPBasicAuth('', pat))
+
+        if response.status_code == 204:
+            deleted_ids.append(build_id)
+        else:
+            print(f"Failed to delete build {build_id}. Status code: {response.status_code}")
+    return deleted_ids
+
+# Pipeline Info
+fun_pipeline_info()
+pipeline_id = input("\nEnter Pipeline ID: ")
+
+# Get Build ID
+build_numbers = get_build_info(pipeline_id)
+print("\nList of Build Number ::\n",build_numbers)
+
+# Get Lease ID's
+print("\n---- Getting Lease no ----\n")
+lease_ids = get_build_leases(build_numbers)
+print("\nList of Lease Number ::")
+print(lease_ids)
+
+# Comment Below to stop delete
+# Delete Lease ID's
+deleted_ids = delete_build_leases(lease_ids)
+print(f"Deleted leases: {', '.join(str(deleted_ids))}")
+
+# Delete Builds
+deleted_ids = delete_builds(build_numbers)
+print(f"Deleted builds: {', '.join(str(deleted_ids))}")
