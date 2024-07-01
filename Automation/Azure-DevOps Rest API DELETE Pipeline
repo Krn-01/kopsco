@@ -1,7 +1,7 @@
 '''
 Author: Karan Joshi
 Last Updated: 16/05/2024
-Description: Delete all Lease and build od CI pipeline of Azure DevOps
+Description: Delete all Lease and build of CI pipeline of Azure DevOps
 Workflow: 
   1. Get All Project Name. 
   2. First Delete Lease associated with builds.

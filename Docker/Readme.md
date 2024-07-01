@@ -1,18 +1,17 @@
-## Command, Useful links, and other Content.
+## Docker Containers
 
-<b> Build the container </b><br/>
+### Usefull Commands
 ```
 docker build -t <app-name> .
-```
+docker run -p 8080:80 <app-name> [-d (Run in Detach mode)]
 
-<b> Run the Container</b><br/>
-```
-docker run -p 8080:80 <app-name>
-```
 
-<b>Debugging Command</b><br/>
-```
+# Debugging Command
 docker images       [List the Images]
 docker ps           [Check the running process]
 docker inspect      [Get detailed info about image]
+
+
+-q  [Output only ID]
+
 ```
