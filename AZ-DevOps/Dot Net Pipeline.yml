@@ -1,0 +1,60 @@
+Here's an example Azure DevOps pipeline YAML that uses the VsBuild@1 task and selects a specific zip file from the published outputs to place under a single directory:
+
+yaml
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  projectPath: '**/*.sln'  # Update this with your solution file path
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '6.x.x'  # Use appropriate version for your project
+
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(projectPath)'
+
+- task: VsBuild@1
+  inputs:
+    solution: '$(projectPath)'
+    msbuildArgs: '/p:Configuration=$(buildConfiguration)'
+    platform: 'Any CPU'
+    configuration: '$(buildConfiguration)'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)\path\to\publish\directory'  # Update this path
+    Contents: '**/specific-file.zip'  # Update this pattern to match your specific file
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/single-directory'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/single-directory'
+    ArtifactName: 'my-artifact'
+
+
+### Explanation:
+1. *UseDotNet, NuGetToolInstaller, and NuGetCommand Tasks*:
+    - Ensures the .NET SDK is installed and restores NuGet packages.
+
+2. *VsBuild Task*:
+    - Builds the solution using Visual Studio Build.
+
+3. *CopyFiles Task*:
+    - SourceFolder: Specifies the folder containing the published zip files. Update this path to your publish directory.
+    - Contents: Pattern to match the specific zip file you want to copy. Update this pattern accordingly.
+    - TargetFolder: The folder where you want to place the specific zip file.
+
+4. *PublishBuildArtifacts Task*:
+    - Publishes the contents of the single-directory folder as a build artifact.
+
+Make sure to adjust the paths and patterns to match your project's structure and specific requirements.

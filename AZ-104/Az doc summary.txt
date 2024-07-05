@@ -37,3 +37,24 @@ Azure Policy is a powerful service in Azure that enables you to enforce rules an
 Management groups provide a way to efficiently manage access, policies, and compliance across multiple subscriptions, allowing for unified policy and access management.
 Creating policy definitions and initiative definitions allows you to define conventions for resources and control the scope of policies, ensuring resource compliance.
 The Compliance feature in Azure Policy helps you determine the compliance state of your resources and evaluate whether they're compliant or compliant.
+
+
+---------------------------------------------------------------------------------------------------------------
+Implement role-based access control
+
+Secure access management for cloud resources is critical for businesses that operate in the cloud. Role-based access control (RBAC) is a mechanism that can help you manage who can access your Azure resources. RBAC lets you determine what operations specific users can do on specific resources, and control what areas of a resource each user can access.
+
+Azure RBAC is an authorization system built on Azure Resource Manager. Azure RBAC provides fine-grained access management of resources in Azure.
+
+Things to know about Azure RBAC
+Here are some things you can do with Azure RBAC:
+
+Allow an application to access all resources in a resource group.
+
+Allow one user to manage VMs in a subscription, and allow another user to manage virtual networks.
+
+Allow a database administrator (DBA) group to manage SQL databases in a subscription.
+
+Allow a user to manage all resources in a resource group, such as VMs, websites, and subnets.
+
+Azure RBAC concepts
