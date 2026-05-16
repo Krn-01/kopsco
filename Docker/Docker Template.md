@@ -1,0 +1,1 @@
+Everybody Should use below template for secure multistage image with faster execution time.

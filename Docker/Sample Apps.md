@@ -1,3 +1,19 @@
+
+Node App
+```
+FROM node:14
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build  
+EXPOSE 3000
+# Commands
+CMD ["npm", "start"]
+```
+
+React App
+```
 # Stage 1: Build the React Application
 FROM ubuntu:20.04 AS build
 
@@ -40,3 +56,5 @@ EXPOSE 80
 
 # Start the Nginx server
 CMD ["nginx", "-g", "daemon off;"]
+
+```

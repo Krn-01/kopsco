@@ -1,6 +1,4 @@
-## Docker Containers
-
-### Usefull Commands
+### Useful Commands
 ```
 docker build -t <app-name> .
 docker run -p 8080:80 <app-name> [-d (Run in Detach mode)]
@@ -13,5 +11,4 @@ docker inspect      [Get detailed info about image]
 
 
 -q  [Output only ID]
-
 ```
